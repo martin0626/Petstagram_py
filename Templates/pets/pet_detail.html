@@ -1,0 +1,67 @@
+{% extends 'navigation.html' %}
+
+{% block head %}
+    <meta charset="UTF-8">
+    <title>Petstagram</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="icon" type="image/png" href="https://pluspng.com/img-png/instagram-png-instagram-png-icon-1024.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%  endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="d-flex">
+            <div class="d-inline p-2 w-50">
+                <img src="{{ Pet.image_url.url }}" class="w-50 rounded mx-auto d-block">
+            </div>
+            <div class="d-inline p-2 w-50">
+                <div class="d-flex justify-content-between">
+                    <h5><u>Type:</u> {{ Pet.type }}</h5>
+                    <h5><u>Name:</u> {{ Pet.name }}</h5>
+                    <h5><u>Age:</u> {{ Pet.age }}</h5>
+                    <h5><u>Owner:</u> {{ owner.username }}</h5>
+                </div>
+                <p class="mt-2">Description: {{ Pet.description }}</p>
+                <div>
+                    {% if owner.id == request.user.id %}
+                        <a href="{% url 'edit' Pet.id%}" class="btn btn-success">Edit</a>
+                        <a href="{% url 'delete' Pet.id%}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                </div>
+                {% if not owner.id == request.user.id %}
+                    {% if not is_liked %}
+                        <a href="{% url 'like pet' Pet.id %}"><i class="fa fa-heart-o" aria-hidden="true"></i></a>
+                    {% else %}
+                        <a href="{% url 'like pet' Pet.id %}"><i class="fa fa-heart" aria-hidden="true"></i></a>
+                    {% endif %}
+                {% endif %}
+                <p class="mt-2">Likes: {{ likes_count }}</p>
+            </div>
+        </div>
+
+        <div class="d-block" style="background-color: #f1e3e3; padding:2%">
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="box">
+                        <h5><em>{{ comment.user.user }}: {{ comment.text }}</em></h5>
+                        <hr>
+                    </div>
+                {% endfor %}
+            {% else %}
+            <div class="box">
+                <h3>There are no comments for this pet. </h3>
+            </div>
+            {% endif %}
+            <div class="box">
+                <form method="post" action="{% url 'comment' Pet.id %}">
+                    {% csrf_token %}
+                    {{form}}
+                    <button class="btn btn-primary mt-2" type="submit">Add comment</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
